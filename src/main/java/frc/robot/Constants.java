@@ -126,5 +126,26 @@ public class Constants {
 
     public static final double MAXSPEED = 0.2;
   }
+
+  public final class CoralConstants {
+
+    // Speeds
+    public static final double CORAL_INTAKE_SPEED = 0.8;
+    public static final double CORAL_OUTTAKE_SPEED = 0.8;
+    public static final double CORAL_PIVOT_SPEED = 0.8;
+
+    // IDs
+    public static final int CORAL_INTAKE_ID = 12;
+    public static final int CORAL_PIVOT_ID = 0;
+    public static final int CORAL_LIMIT_SWITCH_ID = 0;
+    public static final int CORAL_OPTICAL_SENSOR_ID = 1;
+
+    public static class OperatorConstants {
+    public static final int kDriverControllerPort = 0;
+   
+  }
+
+
+}
 }
   
