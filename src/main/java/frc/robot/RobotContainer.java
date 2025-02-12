@@ -5,7 +5,7 @@ import frc.robot.commands.CoralIntakeCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.AlgaeIntakeCmds.IntakeCmd;
 import frc.robot.commands.AlgaeIntakeCmds.OuttakeCmd;
-import frc.robot.commands.AlgaeIntakeCmds.StoragePositionCmd;
+import frc.robot.commands.AlgaePivotCmds.StoragePositionCmd;
 import frc.robot.commands.ElevatorCmds.TestPIDCmd;
 
 import com.pathplanner.lib.auto.AutoBuilder;
