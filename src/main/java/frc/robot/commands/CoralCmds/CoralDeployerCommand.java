@@ -1,14 +1,14 @@
-package frc.robot.commands;
+package frc.robot.commands.CoralCmds;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import frc.robot.Constants.CoralConstants;
 import frc.robot.subsystems.CoralIntakeSubsystem;
 
-public class CoralIntakeCommand extends Command {
 
+public class CoralDeployerCommand extends Command {
     private CoralIntakeSubsystem coralIntakeSub; 
   
-    public CoralIntakeCommand(CoralIntakeSubsystem coralIntakeSub) {
+    public CoralDeployerCommand(CoralIntakeSubsystem coralIntakeSub) {
       this.coralIntakeSub = coralIntakeSub;
       addRequirements(this.coralIntakeSub);
     }
@@ -20,7 +20,7 @@ public class CoralIntakeCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-      coralIntakeSub.setIntakeSpeed(0.1);
+      coralIntakeSub.setIntakeSpeed(CoralConstants.CORAL_DEPLOY_SPEED);
     }
   
     // Called once the command ends or is interrupted.
@@ -32,7 +32,6 @@ public class CoralIntakeCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-      return coralIntakeSub.getOpticalSensor();
+      return false;//!coralIntakeSub.getOpticalSensor();
     }
-  }
-  
+}

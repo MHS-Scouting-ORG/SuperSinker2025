@@ -1,10 +1,13 @@
 package frc.robot;
 
-import frc.robot.commands.CoralDepolyerCommand;
-import frc.robot.commands.CoralIntakeCommand;
 import frc.robot.commands.AlgaeIntakeCmds.IntakeCmd;
 import frc.robot.commands.AlgaeIntakeCmds.OuttakeCmd;
 import frc.robot.commands.AlgaePivotCmds.StoragePositionCmd;
+import frc.robot.commands.CoralCmds.CoralDeployerCommand;
+import frc.robot.commands.CoralCmds.CoralIntakeCommand;
+import frc.robot.commands.CoralCmds.PivotLeftCommand;
+import frc.robot.commands.CoralCmds.PivotMiddleCommand;
+import frc.robot.commands.CoralCmds.PivotRightCommand;
 import frc.robot.commands.ElevatorCmds.TestPIDCmd;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -105,11 +108,17 @@ public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrai
 
     /// CORAL
 
-    // new JoystickButton(xboxOperator, XboxController.Button.kA.value).onTrue(new CoralIntakeCommand(coralIntakeSub));
-    // new JoystickButton(xboxOperator, XboxController.Button.kB.value).onTrue(new CoralDepolyerCommand(coralIntakeSub));
-    // new JoystickButton(xboxOperator, XboxController.Button.kRightBumper.value).onTrue(new InstantCommand(() -> coralIntakeSub.setCoralPivotPIDSetpoint(0)));
-    // new JoystickButton(xboxOperator, XboxController.Button.kX.value).onTrue(new InstantCommand(() -> coralIntakeSub.setCoralPivotPIDSetpoint(45)));
-    // new JoystickButton(xboxOperator, XboxController.Button.kLeftBumper.value).onTrue(new InstantCommand(() -> coralIntakeSub.setCoralPivotPIDSetpoint(-45)));
+    // new JoystickButton(xbox, XboxController.Button.kStart.value).onTrue(new CoralIntakeCommand(coralIntakeSub));
+    // new JoystickButton(xbox, XboxController.Button.kY.value).whileTrue(new CoralDeployerCommand(coralIntakeSub));
+    // new JoystickButton(xbox, XboxController.Button.kX.value).whileTrue(new InstantCommand(() -> coralIntakeSub.setPivotSpeed(-Constants.CORAL_PIVOT_SPEED)));
+    // new JoystickButton(xbox, XboxController.Button.kX.value).whileFalse(new InstantCommand(() -> coralIntakeSub.setPivotSpeed(0)));
+    // new JoystickButton(xbox, XboxController.Button.kY.value).whileTrue(new InstantCommand(() -> coralIntakeSub.setPivotSpeed(Constants.CORAL_PIVOT_SPEED)));
+    // new JoystickButton(xbox, XboxController.Button.kY.value).whileFalse(new InstantCommand(() -> coralIntakeSub.setPivotSpeed(0)));
+    // new JoystickButton(xbox, XboxController.Button.kA.value).onTrue(new PivotRightCommand(coralIntakeSub));
+    // new JoystickButton(xbox, XboxController.Button.kB.value).onTrue(new PivotLeftCommand(coralIntakeSub));
+    // new JoystickButton(xbox, XboxController.Button.kX.value).onTrue(new PivotMiddleCommand(coralIntakeSub));
+
+    //new JoystickButton(stick, 3).onTrue(coralSwitchCmd);
     
     /// ALGAE
 
