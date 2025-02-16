@@ -26,9 +26,15 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import frc.robot.LimelightHelpers;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -39,26 +45,29 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
+
 public class RobotContainer {
   private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
   private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-  .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-  .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+          .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+  private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+  private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-private final Telemetry logger = new Telemetry(MaxSpeed);
+  private final Telemetry logger = new Telemetry(MaxSpeed);
 
-private final CommandXboxController joystick = new CommandXboxController(0);
+  private final CommandXboxController joystick = new CommandXboxController(0);
 
-public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+  public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-
+  /* Path follower */
   private final SendableChooser<Command> autoChooser;
-  
+
+  private PIDController limelightPID = new PIDController(0.001, 0, 0);
+
   
   private final CoralIntakeSubsystem coralIntakeSub = new CoralIntakeSubsystem();
   public final AlgaeIntakeSubsystem algaeIntakeSubsystem = new AlgaeIntakeSubsystem();
@@ -105,6 +114,13 @@ public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrai
         drivetrain.registerTelemetry(logger::telemeterize);
 
         // new JoystickButton(joystick, XboxController.Button.kA.value).onTrue(new InstantCommand(drivetrain::))
+        joystick.x().whileTrue(
+            drivetrain.applyRequest(() ->
+            drive.withVelocityX(-joystick.getLeftY() * MaxSpeed * 0.4) // Drive forward with negative Y (forward)
+                .withVelocityY(-joystick.getLeftX() * MaxSpeed * 0.4) // Drive left with negative X (left)
+                .withRotationalRate(limelightPID.calculate(limelightPID.calculate(LimelightHelpers.getTX("limelight"), 0))) // Drive counterclockwise with negative X (left)
+        )
+        );
 
     /// CORAL
 
