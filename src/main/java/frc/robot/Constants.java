@@ -6,59 +6,55 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
 public class Constants {
-  public static class AlgaeIntakeConstants {
-    // Motor ID's
-    public static final int INTAKEID = 15;
+  public static class AlgaeIntakeConstants{
+    //Motor ID's
+    public static final int INTAKEID = 17;
+    
+    //Sensor ID's
+    public static final int OPTICALID = 0;
 
-    // Sensor ID's
-    public static final int OPTICALID = 1;
-
-    // Current Limiting
+    //Current Limiting
     public static final boolean CURRENTLIMIT = true;
 
-    // Intake Max Speeds
-    public static final double INTAKEMAXSPEED = 0.6;
+    //Intake Max Speeds
+    public static final double INTAKEMAXSPEED = 1.0;
     public static final double OUTTAKEMAXSPEED = 1.0;
+
+    public static final int PIVOTID = 18;
+
+    //Sensor ID's  
+    public static final int LSID = 3;
+
+    //PID Constants and Other Important Variables
+    //0.000000000001
+    //0.0003
+    public static final double KP = 0.00055;
+    public static final double KI = 0.0007;//0.0005; //0.0004;
+    public static final double KD = 0.000002; //0.00005;
+
+    public static final double TOLERANCE = 40;
+
+    //Pivot Max Speed
+    public static final double MANUALPIVOTMAXSPEED = 1.0;
+    public static final double PIVOTMAXSPEED = 0.5;
   }
 
-  public static class AlgaePivotConstants {
-    // Motor ID's
-    public static final int PIVOTID = 14;
+  public static class ElevatorConstants{
+    //Motor ID's
+    public static final int LIFTID = 14;
 
-    // Sensor ID's
-    public static final int OPTICALID = 8;
-    public static final int LSID = 9;
-
-    // Current Limiting
-    public static final boolean CURRENTLIMIT = true;
-
-    // PID Constants and Other Important Variables
-    public static final double KP = 0.0005;
-    public static final double KI = 0.;
-    public static final double KD = 0.;
-
-    public static final double TOLERANCE = 100.0;
-
-    // Pivot Max Speed
-    public static final double PIVOTMAXSPEED = 0.2;
-  }
-
-  public static class ElevatorConstants {
-    // Motor ID's
-    public static final int LIFTID = 8;
-
-    // Sensor ID's
+    //Sensor ID's
     public static final int UPPERLSID = 3;
-    public static final int BOTTOMLSID = 5;
+    public static final int BOTTOMLSID = 2;
 
-    // PID Constants and Other Important Variables
-    public static final double KP = 0.01;
-    public static final double KI = 0.0;
+    //PID Constants and Other Important Variables
+    public static final double KP = 0.02;
+    public static final double KI = 0.01;
     public static final double KD = 0.0;
 
-    public static final double TOLERANCE = 5;
+    public static final double TOLERANCE = 1; 
 
-    public static final double MAXSPEED = 0.2;
+    public static final double MAXSPEED = 0.8;
   }
 
   public final class CoralConstants {

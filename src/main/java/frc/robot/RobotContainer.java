@@ -2,13 +2,11 @@ package frc.robot;
 
 import frc.robot.commands.AlgaeIntakeCmds.IntakeCmd;
 import frc.robot.commands.AlgaeIntakeCmds.OuttakeCmd;
-import frc.robot.commands.AlgaePivotCmds.StoragePositionCmd;
 import frc.robot.commands.CoralCmds.CoralDeployerCommand;
 import frc.robot.commands.CoralCmds.CoralIntakeCommand;
 import frc.robot.commands.CoralCmds.PivotLeftCommand;
 import frc.robot.commands.CoralCmds.PivotMiddleCommand;
 import frc.robot.commands.CoralCmds.PivotRightCommand;
-import frc.robot.commands.ElevatorCmds.TestPIDCmd;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -17,6 +15,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
@@ -59,96 +60,98 @@ public class RobotContainer {
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
-  private final CommandXboxController joystick = new CommandXboxController(0);
+  /* * * CONTROLLERS * * */
+  private final CommandXboxController d_xbox = new CommandXboxController(0);
+  private final CommandXboxController o_xbox = new CommandXboxController(1); 
 
-  public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-
-  /* Path follower */
+  /* * * AUTO CHOOSER * * */
   private final SendableChooser<Command> autoChooser;
 
   private PIDController limelightPID = new PIDController(0.001, 0, 0);
 
-  
+  /* * * SUBSYSTEMS * * */
+  public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   private final CoralIntakeSubsystem coralIntakeSub = new CoralIntakeSubsystem();
   public final AlgaeIntakeSubsystem algaeIntakeSubsystem = new AlgaeIntakeSubsystem();
   public final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
-  
-  XboxController xboxDriver = new XboxController(0);
-  XboxController xboxOperator = new XboxController(1);
 
   public RobotContainer() {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
+
     configureBindings();
   }
 
   private void configureBindings() {
 
-    /// SWERVE 
+    //////////////////////////
+    //        DRIVER        //
+    //////////////////////////
+
+    // SWERVE 
     // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed * 0.4) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed * 0.4) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate * 0.6) // Drive counterclockwise with negative X (left)
-            )
-        );
+      // and Y is defined as to the left according to WPILib convention.
+      drivetrain.setDefaultCommand(
+          // Drivetrain will execute this command periodically
+          drivetrain.applyRequest(() ->
+              drive.withVelocityX(-d_xbox.getLeftY() * MaxSpeed * 0.4) // Drive forward with negative Y (forward)
+                  .withVelocityY(-d_xbox.getLeftX() * MaxSpeed * 0.4) // Drive left with negative X (left)
+                  .withRotationalRate(-d_xbox.getRightX() * MaxAngularRate * 0.6) // Drive counterclockwise with negative X (left)
+          )
+      );  
 
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        ));
+      // RESET HEADING 
+      // reset the field-centric heading on left bumper press
+      d_xbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+      drivetrain.registerTelemetry(logger::telemeterize);
 
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-        joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+      // OUTPUT CORAL 
+      d_xbox.a().onTrue(new CoralDeployerCommand(coralIntakeSub)); 
+      // INTAKE CORAL 
+      d_xbox.b().whileTrue(new ParallelCommandGroup(
+          new CoralIntakeCommand(coralIntakeSub), 
+          new PivotMiddleCommand(coralIntakeSub)
+      ));
 
-        // reset the field-centric heading on left bumper press
-        joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        drivetrain.registerTelemetry(logger::telemeterize);
+      /* * * CTRE STUFF * * */
 
-        // new JoystickButton(joystick, XboxController.Button.kA.value).onTrue(new InstantCommand(drivetrain::))
-        joystick.x().whileTrue(
-            drivetrain.applyRequest(() ->
-            drive.withVelocityX(-joystick.getLeftY() * MaxSpeed * 0.4) // Drive forward with negative Y (forward)
-                .withVelocityY(-joystick.getLeftX() * MaxSpeed * 0.4) // Drive left with negative X (left)
-                .withRotationalRate(limelightPID.calculate(limelightPID.calculate(LimelightHelpers.getTX("limelight"), 0))) // Drive counterclockwise with negative X (left)
-        )
-        );
+      // EMERGENCY STOP DRIVETRAIN 
+      // d_xbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
+      /// ROBOT ORIENTED?? 
+      // d_xbox.b().whileTrue(drivetrain.applyRequest(() ->
+      //     point.withModuleDirection(new Rotation2d(-d_xbox.getLeftY(), -d_xbox.getLeftX()))
+      // ));
 
-    /// CORAL
+      // SYSID 
+      // Run SysId routines when holding back/start and X/Y.
+      // Note that each routine should be run exactly once in a single log.
+      // d_xbox.back().and(d_xbox.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+      // d_xbox.back().and(d_xbox.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+      // d_xbox.start().and(d_xbox.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+      // d_xbox.start().and(d_xbox.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-    // new JoystickButton(xbox, XboxController.Button.kStart.value).onTrue(new CoralIntakeCommand(coralIntakeSub));
-    // new JoystickButton(xbox, XboxController.Button.kY.value).whileTrue(new CoralDeployerCommand(coralIntakeSub));
-    // new JoystickButton(xbox, XboxController.Button.kX.value).whileTrue(new InstantCommand(() -> coralIntakeSub.setPivotSpeed(-Constants.CORAL_PIVOT_SPEED)));
-    // new JoystickButton(xbox, XboxController.Button.kX.value).whileFalse(new InstantCommand(() -> coralIntakeSub.setPivotSpeed(0)));
-    // new JoystickButton(xbox, XboxController.Button.kY.value).whileTrue(new InstantCommand(() -> coralIntakeSub.setPivotSpeed(Constants.CORAL_PIVOT_SPEED)));
-    // new JoystickButton(xbox, XboxController.Button.kY.value).whileFalse(new InstantCommand(() -> coralIntakeSub.setPivotSpeed(0)));
-    // new JoystickButton(xbox, XboxController.Button.kA.value).onTrue(new PivotRightCommand(coralIntakeSub));
-    // new JoystickButton(xbox, XboxController.Button.kB.value).onTrue(new PivotLeftCommand(coralIntakeSub));
-    // new JoystickButton(xbox, XboxController.Button.kX.value).onTrue(new PivotMiddleCommand(coralIntakeSub));
-
-    //new JoystickButton(stick, 3).onTrue(coralSwitchCmd);
+    //////////////////////////
+    //       OPERATOR       //
+    //////////////////////////
     
-    /// ALGAE
+    // CORAL LEFT/RIGHT 
+    o_xbox.leftBumper().onTrue(new PivotLeftCommand(coralIntakeSub)); 
+    o_xbox.rightBumper().onTrue(new PivotRightCommand(coralIntakeSub));
 
-    //button control to move the algae pivot to the storage position
-    // new JoystickButton(xboxOperator, XboxController.Button.kB.value).onTrue(new StoragePositionCmd(algaeIntakeSubsystem));
+    //////////////////////////
+    //        TESTING       //
+    //////////////////////////
 
-    // new JoystickButton(xboxOperator, XboxController.Button.kY.value).onTrue(new IntakeCmd(algaeIntakeSubsystem));
-    // new JoystickButton(xboxOperator, XboxController.Button.kX.value).whileTrue(new OuttakeCmd(algaeIntakeSubsystem));
-    
-    /// ELEVATOR
-
-    // new JoystickButton(xboxOperator, XboxController.Button.kA.value).onTrue(new TestPIDCmd(elevatorSubsystem, 100));
-    // new JoystickButton(xboxOperator, XboxController.Button.kB.value).onTrue(new TestPIDCmd(elevatorSubsystem, 0));
-    
+    // LIMELIGHT TESTING 
+      // new JoystickButton(joystick, XboxController.Button.kA.value).onTrue(new InstantCommand(drivetrain::))
+      d_xbox.x().whileTrue(
+          drivetrain.applyRequest(() ->
+          drive.withVelocityX(-d_xbox.getLeftY() * MaxSpeed * 0.4) // Drive forward with negative Y (forward)
+              .withVelocityY(-d_xbox.getLeftX() * MaxSpeed * 0.4) // Drive left with negative X (left)
+              .withRotationalRate(limelightPID.calculate(limelightPID.calculate(LimelightHelpers.getTX("limelight"), 0))) // Drive counterclockwise with negative X (left)
+          )
+      );
   }
 
  

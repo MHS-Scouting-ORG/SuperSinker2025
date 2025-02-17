@@ -5,13 +5,13 @@
 package frc.robot.commands.AlgaePivotCmds;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.AlgaePivotSubsystem;
+import frc.robot.subsystems.AlgaeIntakeSubsystem;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+//Algae Pivot: Processor Position and Pick Up Off the Ground Position are the same position
 public class ProcessorPositionCmd extends Command {
-  AlgaePivotSubsystem algaeIntakeSub;
+  AlgaeIntakeSubsystem algaeIntakeSub;
 
-  public ProcessorPositionCmd(AlgaePivotSubsystem newAlgaeIntakeSub) {
+  public ProcessorPositionCmd(AlgaeIntakeSubsystem newAlgaeIntakeSub) {
     algaeIntakeSub = newAlgaeIntakeSub;
     addRequirements(algaeIntakeSub);
   }
@@ -19,22 +19,24 @@ public class ProcessorPositionCmd extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    algaeIntakeSub.setSetpoint(0);
+    // timer.reset();
+    algaeIntakeSub.setSetpoint(-1100); //-1350
+    algaeIntakeSub.enablePID();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    algaeIntakeSub.enablePID();
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return algaeIntakeSub.isDone();
   }
 }
