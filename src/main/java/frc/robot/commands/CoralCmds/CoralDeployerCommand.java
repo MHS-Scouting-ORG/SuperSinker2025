@@ -1,8 +1,9 @@
 package frc.robot.commands.CoralCmds;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.CoralConstants;
+import frc.robot.Constants;
 import frc.robot.subsystems.CoralIntakeSubsystem;
+import frc.robot.Constants.CoralConstants;
 
 
 public class CoralDeployerCommand extends Command {
@@ -32,6 +33,6 @@ public class CoralDeployerCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-      return false;//!coralIntakeSub.getOpticalSensor();
+      return !coralIntakeSub.getOpticalSensor();
     }
 }

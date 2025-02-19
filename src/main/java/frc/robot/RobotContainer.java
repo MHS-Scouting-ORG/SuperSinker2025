@@ -2,6 +2,7 @@ package frc.robot;
 
 import frc.robot.commands.AlgaeIntakeCmds.IntakeCmd;
 import frc.robot.commands.AlgaeIntakeCmds.OuttakeCmd;
+import frc.robot.commands.AlgaePivotCmds.DealgifyL3PositionCmd;
 import frc.robot.commands.AlgaePivotCmds.NoAlgaeTuckCmd;
 import frc.robot.commands.CoralCmds.CoralDeployerCommand;
 import frc.robot.commands.CoralCmds.CoralIntakeCommand;
@@ -30,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
+import frc.robot.subsystems.CoralPivotSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 
 import static edu.wpi.first.units.Units.*;
@@ -50,7 +52,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction; 
 
 import frc.robot.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -76,13 +78,14 @@ public class RobotContainer {
   private final Joystick o_joystick = new Joystick(1); 
 
   /* * * AUTO CHOOSER * * */
-  // private final SendableChooser<Command> autoChooser;
+  private final SendableChooser<Command> autoChooser;
 
   private PIDController limelightPID = new PIDController(0.001, 0, 0);
 
   /* * * SUBSYSTEMS * * */
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   private final CoralIntakeSubsystem coralIntakeSub = new CoralIntakeSubsystem();
+  private final CoralPivotSubsystem coralPivotSub = new CoralPivotSubsystem(); 
   public final AlgaeIntakeSubsystem algaeIntakeSubsystem = new AlgaeIntakeSubsystem();
   public final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
 
@@ -91,8 +94,8 @@ public class RobotContainer {
 
 
   public RobotContainer() {
-    // autoChooser = AutoBuilder.buildAutoChooser();
-    // SmartDashboard.putData("Auto Chooser", autoChooser);
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser", autoChooser);
 
     configureBindings();
   }
@@ -109,9 +112,9 @@ public class RobotContainer {
       drivetrain.setDefaultCommand(
           // Drivetrain will execute this command periodically
           drivetrain.applyRequest(() ->
-              drive.withVelocityX(-d_xbox.getLeftY() * MaxSpeed * 0.4) // Drive forward with negative Y (forward)
-                  .withVelocityY(-d_xbox.getLeftX() * MaxSpeed * 0.4) // Drive left with negative X (left)
-                  .withRotationalRate(-d_xbox.getRightX() * MaxAngularRate * 0.6) // Drive counterclockwise with negative X (left)
+              drive.withVelocityX(-d_xbox.getLeftY() * MaxSpeed * 0.5) // Drive forward with negative Y (forward)
+                  .withVelocityY(-d_xbox.getLeftX() * MaxSpeed * 0.5) // Drive left with negative X (left)
+                  .withRotationalRate(-d_xbox.getRightX() * MaxAngularRate * 0.7) // Drive counterclockwise with negative X (left)
           )
       );  
 
@@ -123,7 +126,7 @@ public class RobotContainer {
       // OUTPUT CORAL 
       d_xbox.leftBumper().whileTrue(new CoralDeployerCommand(coralIntakeSub)); 
       // INTAKE CORAL 
-      d_xbox.rightBumper().whileTrue(new CoralIntakeCommand(coralIntakeSub)); 
+      d_xbox.rightBumper().whileTrue(new CoralIntakeCommand(coralIntakeSub, coralPivotSub)); 
 
       // IMTAKE ALGAE FROM GROUND
       d_xbox.a().onTrue(new AlgaeGroundPickup(elevatorSubsystem, algaeIntakeSubsystem)); 
@@ -133,7 +136,7 @@ public class RobotContainer {
 
       // EMERGENCY STOP DRIVETRAIN 
       // d_xbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
-      /// ROBOT ORIENTED?? 
+      /// POINT WHEELS  
       // d_xbox.b().whileTrue(drivetrain.applyRequest(() ->
       //     point.withModuleDirection(new Rotation2d(-d_xbox.getLeftY(), -d_xbox.getLeftX()))
       // ));
@@ -154,8 +157,8 @@ public class RobotContainer {
     /// 11- TUCK W ALG    12- TUCK WO ALG 
     
     // CORAL LEFT/RIGHT 
-    new JoystickButton(o_joystick, 3).onTrue(new PivotLeftCommand(coralIntakeSub)); 
-    new JoystickButton(o_joystick, 4).onTrue(new PivotRightCommand(coralIntakeSub));
+    new JoystickButton(o_joystick, 3).onTrue(new PivotLeftCommand(coralPivotSub)); 
+    new JoystickButton(o_joystick, 4).onTrue(new PivotRightCommand(coralPivotSub));
 
     // ALGAE INTAKE OVERRIDE 
     new JoystickButton(o_joystick, 2).whileTrue(new IntakeCmd(algaeIntakeSubsystem)); 
@@ -171,7 +174,7 @@ public class RobotContainer {
     // SCORING 
     new JoystickButton(o_joystick, 9).onTrue(new L2Dealgify(elevatorSubsystem, algaeIntakeSubsystem)); 
     new JoystickButton(o_joystick, 7).onTrue(new L3ElevPos(elevatorSubsystem)); 
-    // new JoystickButton(o_joystick, 6).onTrue(new L3Dealgify(elevatorSubsystem, algaeIntakeSubsystem)); 
+    // new JoystickButton(o_joystick, 6).onTrue(new DealgifyL3PositionCmd(algaeIntakeSubsystem)); 
     new JoystickButton(o_joystick, 8).onTrue(new L2ElevPos(elevatorSubsystem)); 
 
     //////////////////////////
@@ -198,7 +201,7 @@ public class RobotContainer {
   }
  
   public Command getAutonomousCommand() {
-    // return autoChooser.getSelected();
-    return null; 
+    return autoChooser.getSelected();
+    // return null; 
   }
 }

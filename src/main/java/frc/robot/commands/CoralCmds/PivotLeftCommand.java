@@ -5,23 +5,23 @@
 package frc.robot.commands.CoralCmds;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.CoralIntakeSubsystem;
+import frc.robot.subsystems.CoralPivotSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class PivotLeftCommand extends Command {
-  private CoralIntakeSubsystem coralSub;
+  private CoralPivotSubsystem coralPivotSub;
   /** Creates a new PivotRightCommand. */
-  public PivotLeftCommand(CoralIntakeSubsystem coralSub) {
-    this.coralSub = coralSub;
-    addRequirements(coralSub);
+  public PivotLeftCommand(CoralPivotSubsystem coralPivotSub) {
+    this.coralPivotSub = coralPivotSub;
+    addRequirements(this.coralPivotSub);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    coralSub.setPIDStatus(true);
-    coralSub.setCoralPivotPIDSetpoint(-600);
+    coralPivotSub.setPIDStatus(true);
+    coralPivotSub.setCoralPivotPIDSetpoint(-700);
   }
 
   // Called every time the scheduler runs while theS command is scheduled.
@@ -35,6 +35,6 @@ public class PivotLeftCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return coralSub.atSetpoint();
+    return coralPivotSub.atSetpoint();
   }
 }
