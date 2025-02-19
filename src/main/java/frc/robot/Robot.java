@@ -13,8 +13,16 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
 
+  private final Command disableAlgaePivotPID;
+  private Command elevInit;
+
   public Robot() {
     m_robotContainer = new RobotContainer();
+
+    elevInit = m_robotContainer.ElevInit();
+    // algaeInit = m_robotContainer.algaeInit();
+    disableAlgaePivotPID = m_robotContainer.disableAlgaeIntakePID();
+
   }
 
   @Override
@@ -48,9 +56,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+
+    elevInit.schedule();
+    elevInit.cancel();
+
+    disableAlgaePivotPID.schedule();
+    disableAlgaePivotPID.cancel();
+    
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
   }
 
   @Override

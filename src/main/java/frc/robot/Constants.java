@@ -16,6 +16,9 @@ public class Constants {
     //Current Limiting
     public static final boolean CURRENTLIMIT = true;
 
+    // Timeout for PID controller
+    public static final double TIMEOUT = 0.125;
+
     //Intake Max Speeds
     public static final double INTAKEMAXSPEED = 1.0;
     public static final double OUTTAKEMAXSPEED = 1.0;
@@ -39,6 +42,7 @@ public class Constants {
     public static final double PIVOTMAXSPEED = 0.5;
   }
 
+
   public static class ElevatorConstants{
     //Motor ID's
     public static final int LIFTID = 14;
@@ -52,7 +56,7 @@ public class Constants {
     public static final double KI = 0.01;
     public static final double KD = 0.0;
 
-    public static final double TOLERANCE = 1; 
+    public static final double TOLERANCE = 5; 
 
     public static final double MAXSPEED = 0.8;
   }
@@ -68,7 +72,6 @@ public class Constants {
     // IDs
     public static final int CORAL_INTAKE_ID = 15;
     public static final int CORAL_PIVOT_ID = 16;
-    public static final int CORAL_LIMIT_SWITCH_ID = 0;
     public static final int CORAL_OPTICAL_SENSOR_ID = 1;
 
   }

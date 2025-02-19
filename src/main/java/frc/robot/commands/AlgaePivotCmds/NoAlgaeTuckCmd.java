@@ -21,7 +21,7 @@ public class NoAlgaeTuckCmd extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    algaeIntakeSub.setSetpoint(5);
+    algaeIntakeSub.setSetpoint(40);
     // algaeIntakeSub.disablePID();
     // algaeIntakeSub.setOutput(0.3);
     // algaeIntakeSub.setSetpoint(5);
@@ -48,6 +48,6 @@ public class NoAlgaeTuckCmd extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return algaeIntakeSub.getLSValue();
+    return algaeIntakeSub.getLSValue() || algaeIntakeSub.isDone();
   }
 }

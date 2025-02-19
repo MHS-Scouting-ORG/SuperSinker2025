@@ -2,14 +2,23 @@ package frc.robot;
 
 import frc.robot.commands.AlgaeIntakeCmds.IntakeCmd;
 import frc.robot.commands.AlgaeIntakeCmds.OuttakeCmd;
+import frc.robot.commands.AlgaePivotCmds.NoAlgaeTuckCmd;
 import frc.robot.commands.CoralCmds.CoralDeployerCommand;
 import frc.robot.commands.CoralCmds.CoralIntakeCommand;
 import frc.robot.commands.CoralCmds.PivotLeftCommand;
 import frc.robot.commands.CoralCmds.PivotMiddleCommand;
 import frc.robot.commands.CoralCmds.PivotRightCommand;
+import frc.robot.commands.ElevatorCmds.L2ElevPos;
+import frc.robot.commands.ElevatorCmds.L3ElevPos;
+import frc.robot.commands.IntegratedCmds.AlgaeGroundPickup;
+import frc.robot.commands.IntegratedCmds.L2Dealgify;
+import frc.robot.commands.IntegratedCmds.ProcessorScoring;
+import frc.robot.commands.IntegratedCmds.TuckCmd;
+import frc.robot.commands.IntegratedCmds.TuckWithAlgae;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -48,6 +57,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 
 public class RobotContainer {
+
   private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
   private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
@@ -62,10 +72,11 @@ public class RobotContainer {
 
   /* * * CONTROLLERS * * */
   private final CommandXboxController d_xbox = new CommandXboxController(0);
-  private final CommandXboxController o_xbox = new CommandXboxController(1); 
+  // private final CommandXboxController o_xbox = new CommandXboxController(1); 
+  private final Joystick o_joystick = new Joystick(1); 
 
   /* * * AUTO CHOOSER * * */
-  private final SendableChooser<Command> autoChooser;
+  // private final SendableChooser<Command> autoChooser;
 
   private PIDController limelightPID = new PIDController(0.001, 0, 0);
 
@@ -75,9 +86,13 @@ public class RobotContainer {
   public final AlgaeIntakeSubsystem algaeIntakeSubsystem = new AlgaeIntakeSubsystem();
   public final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
 
+  public final Command elevInit = new InstantCommand(() -> elevatorSubsystem.turnPIDOff(), elevatorSubsystem);
+  public final Command disableAlgaeIntakePID = new InstantCommand(() -> algaeIntakeSubsystem.disablePID(), algaeIntakeSubsystem);
+
+
   public RobotContainer() {
-    autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    // autoChooser = AutoBuilder.buildAutoChooser();
+    // SmartDashboard.putData("Auto Chooser", autoChooser);
 
     configureBindings();
   }
@@ -101,18 +116,18 @@ public class RobotContainer {
       );  
 
       // RESET HEADING 
-      // reset the field-centric heading on left bumper press
-      d_xbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+      // reset the field-centric heading 
+      d_xbox.button(8).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
       drivetrain.registerTelemetry(logger::telemeterize);
 
       // OUTPUT CORAL 
-      d_xbox.a().onTrue(new CoralDeployerCommand(coralIntakeSub)); 
+      d_xbox.leftBumper().whileTrue(new CoralDeployerCommand(coralIntakeSub)); 
       // INTAKE CORAL 
-      d_xbox.b().whileTrue(new ParallelCommandGroup(
-          new CoralIntakeCommand(coralIntakeSub), 
-          new PivotMiddleCommand(coralIntakeSub)
-      ));
+      d_xbox.rightBumper().whileTrue(new CoralIntakeCommand(coralIntakeSub)); 
 
+      // IMTAKE ALGAE FROM GROUND
+      d_xbox.a().onTrue(new AlgaeGroundPickup(elevatorSubsystem, algaeIntakeSubsystem)); 
+      d_xbox.b().whileTrue(new OuttakeCmd(algaeIntakeSubsystem)); 
 
       /* * * CTRE STUFF * * */
 
@@ -134,10 +149,30 @@ public class RobotContainer {
     //////////////////////////
     //       OPERATOR       //
     //////////////////////////
+    /// 7- L3 DEALG       8- L2 ELEV 
+    /// 9- L2 DEALG       10- PROCESSOR 
+    /// 11- TUCK W ALG    12- TUCK WO ALG 
     
     // CORAL LEFT/RIGHT 
-    o_xbox.leftBumper().onTrue(new PivotLeftCommand(coralIntakeSub)); 
-    o_xbox.rightBumper().onTrue(new PivotRightCommand(coralIntakeSub));
+    new JoystickButton(o_joystick, 3).onTrue(new PivotLeftCommand(coralIntakeSub)); 
+    new JoystickButton(o_joystick, 4).onTrue(new PivotRightCommand(coralIntakeSub));
+
+    // ALGAE INTAKE OVERRIDE 
+    new JoystickButton(o_joystick, 2).whileTrue(new IntakeCmd(algaeIntakeSubsystem)); 
+
+    // TUCKS 
+    new JoystickButton(o_joystick, 11).onTrue(new TuckWithAlgae(algaeIntakeSubsystem, elevatorSubsystem)); 
+    new JoystickButton(o_joystick, 12).onTrue(new TuckCmd(algaeIntakeSubsystem, elevatorSubsystem)); 
+    new JoystickButton(o_joystick, 5).onTrue(new NoAlgaeTuckCmd(algaeIntakeSubsystem)); 
+
+    // PROCESSOR 
+    new JoystickButton(o_joystick, 10).onTrue(new ProcessorScoring(algaeIntakeSubsystem, elevatorSubsystem)); 
+
+    // SCORING 
+    new JoystickButton(o_joystick, 9).onTrue(new L2Dealgify(elevatorSubsystem, algaeIntakeSubsystem)); 
+    new JoystickButton(o_joystick, 7).onTrue(new L3ElevPos(elevatorSubsystem)); 
+    // new JoystickButton(o_joystick, 6).onTrue(new L3Dealgify(elevatorSubsystem, algaeIntakeSubsystem)); 
+    new JoystickButton(o_joystick, 8).onTrue(new L2ElevPos(elevatorSubsystem)); 
 
     //////////////////////////
     //        TESTING       //
@@ -154,8 +189,16 @@ public class RobotContainer {
       );
   }
 
+  public Command ElevInit() {
+    return elevInit;
+  }
+
+  public Command disableAlgaeIntakePID(){
+    return disableAlgaeIntakePID;
+  }
  
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    // return autoChooser.getSelected();
+    return null; 
   }
 }

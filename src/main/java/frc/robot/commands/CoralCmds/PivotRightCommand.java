@@ -4,6 +4,7 @@
 
 package frc.robot.commands.CoralCmds;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CoralIntakeSubsystem;
 
@@ -22,6 +23,8 @@ public class PivotRightCommand extends Command {
   public void initialize() {
     coralSub.setPIDStatus(true);
     coralSub.setCoralPivotPIDSetpoint(0);
+
+    SmartDashboard.putBoolean("CoralIntakeRightRunning?", true); 
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -30,11 +33,13 @@ public class PivotRightCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    SmartDashboard.putBoolean("CoralIntakeRightRunning?", false); 
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return coralSub.atSetpoint();
+    return coralSub.atSetpoint() || coralSub.getLimitSwitch();
   }
 }

@@ -27,7 +27,7 @@ public class L2ElevPos extends Command {
   @Override
   public void initialize() {
     elevatorSubsystem.turnPIDOn();
-    elevatorSubsystem.setSetpoint(31);
+    elevatorSubsystem.setSetpoint(26);
     timer.stop();
     timer.reset();
   }

@@ -11,12 +11,13 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.PIDController;
+import frc.robot.Constants;
 import frc.robot.Constants.CoralConstants;
 
 public class CoralIntakeSubsystem extends SubsystemBase {
 
   private final TalonSRX coralIntake, coralPivot;
-  private final DigitalInput opticalSensor, limitSwitch;
+  private final DigitalInput opticalSensor;
   private PIDController pivotPIDController;
   private int setpoint;
   private boolean pidStatus = false;
@@ -26,7 +27,6 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     coralIntake = new TalonSRX(CoralConstants.CORAL_INTAKE_ID);
     coralPivot = new TalonSRX(CoralConstants.CORAL_PIVOT_ID);
     opticalSensor = new DigitalInput(CoralConstants.CORAL_OPTICAL_SENSOR_ID);
-    limitSwitch = new DigitalInput(CoralConstants.CORAL_LIMIT_SWITCH_ID);
     coralIntake.configForwardLimitSwitchSource(RemoteLimitSwitchSource.RemoteTalonSRX, LimitSwitchNormal.NormallyOpen, CoralConstants.CORAL_INTAKE_ID);
     pivotPIDController = new PIDController(0.0007,0, 0);
     pivotPIDController.setTolerance(25);
@@ -90,8 +90,10 @@ public class CoralIntakeSubsystem extends SubsystemBase {
 
   // return true if at setpoint
   public boolean atSetpoint(){
-    return (coralPivot.getSensorCollection().getQuadraturePosition() >= setpoint - 20) && 
-    (coralPivot.getSensorCollection().getQuadraturePosition() <= setpoint + 20);
+    // return (coralPivot.getSensorCollection().getQuadraturePosition() >= setpoint) && 
+    // (coralPivot.getSensorCollection().getQuadraturePosition() <= setpoint);
+
+    return pivotPIDController.atSetpoint();
   }
 
   @Override
