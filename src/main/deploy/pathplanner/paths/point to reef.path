@@ -39,6 +39,38 @@
         "x": 6.5,
         "y": 5.0
       },
+      "nextControl": {
+        "x": 6.5,
+        "y": 3.0
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.5,
+        "y": 2.0
+      },
+      "prevControl": {
+        "x": 5.560752128503639,
+        "y": 1.9999999999999998
+      },
+      "nextControl": {
+        "x": 3.4392478714963612,
+        "y": 2.0
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.5,
+        "y": 4.0
+      },
+      "prevControl": {
+        "x": 2.5,
+        "y": 3.0
+      },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
@@ -54,7 +86,7 @@
       },
       "rotationOffset": 0.0,
       "minWaypointRelativePos": 0.0,
-      "maxWaypointRelativePos": 2.75,
+      "maxWaypointRelativePos": 4.0,
       "name": "Point Towards Zone"
     }
   ],

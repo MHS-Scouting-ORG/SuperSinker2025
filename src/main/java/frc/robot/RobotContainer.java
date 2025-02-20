@@ -18,6 +18,7 @@ import frc.robot.commands.IntegratedCmds.TuckCmd;
 import frc.robot.commands.IntegratedCmds.TuckWithAlgae;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -37,6 +38,7 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -70,6 +72,10 @@ public class RobotContainer {
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
+  private final SwerveRequest.RobotCentric driveRobotCentric = new SwerveRequest.RobotCentric()
+          .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage); 
+
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
   /* * * CONTROLLERS * * */
@@ -94,6 +100,9 @@ public class RobotContainer {
 
 
   public RobotContainer() {
+
+    registerNamedCommands();
+
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -118,6 +127,14 @@ public class RobotContainer {
           )
       );  
 
+      // ROBOT CENTRIC 
+      d_xbox.x().whileTrue(
+          drivetrain.applyRequest(() -> 
+              driveRobotCentric.withVelocityX(-d_xbox.getLeftY() * MaxSpeed * 0.5)
+              .withVelocityY(-d_xbox.getLeftX() * MaxSpeed * 0.5)
+              .withRotationalRate(-d_xbox.getRightX() * MaxAngularRate * 0.7))
+      );
+
       // RESET HEADING 
       // reset the field-centric heading 
       d_xbox.button(8).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
@@ -128,26 +145,26 @@ public class RobotContainer {
       // INTAKE CORAL 
       d_xbox.rightBumper().whileTrue(new CoralIntakeCommand(coralIntakeSub, coralPivotSub)); 
 
-      // IMTAKE ALGAE FROM GROUND
-      d_xbox.a().onTrue(new AlgaeGroundPickup(elevatorSubsystem, algaeIntakeSubsystem)); 
-      d_xbox.b().whileTrue(new OuttakeCmd(algaeIntakeSubsystem)); 
+      // // IMTAKE ALGAE FROM GROUND
+      // d_xbox.a().onTrue(new AlgaeGroundPickup(elevatorSubsystem, algaeIntakeSubsystem)); 
+      // d_xbox.b().whileTrue(new OuttakeCmd(algaeIntakeSubsystem)); 
 
       /* * * CTRE STUFF * * */
 
       // EMERGENCY STOP DRIVETRAIN 
-      // d_xbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
+      d_xbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
       /// POINT WHEELS  
-      // d_xbox.b().whileTrue(drivetrain.applyRequest(() ->
-      //     point.withModuleDirection(new Rotation2d(-d_xbox.getLeftY(), -d_xbox.getLeftX()))
-      // ));
+      d_xbox.b().whileTrue(drivetrain.applyRequest(() ->
+          point.withModuleDirection(new Rotation2d(-d_xbox.getLeftY(), -d_xbox.getLeftX()))
+      ));
 
       // SYSID 
       // Run SysId routines when holding back/start and X/Y.
       // Note that each routine should be run exactly once in a single log.
-      // d_xbox.back().and(d_xbox.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-      // d_xbox.back().and(d_xbox.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-      // d_xbox.start().and(d_xbox.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-      // d_xbox.start().and(d_xbox.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+      d_xbox.back().and(d_xbox.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+      d_xbox.back().and(d_xbox.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+      d_xbox.start().and(d_xbox.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+      d_xbox.start().and(d_xbox.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
     //////////////////////////
     //       OPERATOR       //
@@ -183,13 +200,13 @@ public class RobotContainer {
 
     // LIMELIGHT TESTING 
       // new JoystickButton(joystick, XboxController.Button.kA.value).onTrue(new InstantCommand(drivetrain::))
-      d_xbox.x().whileTrue(
-          drivetrain.applyRequest(() ->
-          drive.withVelocityX(-d_xbox.getLeftY() * MaxSpeed * 0.4) // Drive forward with negative Y (forward)
-              .withVelocityY(-d_xbox.getLeftX() * MaxSpeed * 0.4) // Drive left with negative X (left)
-              .withRotationalRate(limelightPID.calculate(limelightPID.calculate(LimelightHelpers.getTX("limelight"), 0))) // Drive counterclockwise with negative X (left)
-          )
-      );
+      // d_xbox.x().whileTrue(
+      //     drivetrain.applyRequest(() ->
+      //     drive.withVelocityX(-d_xbox.getLeftY() * MaxSpeed * 0.4) // Drive forward with negative Y (forward)
+      //         .withVelocityY(-d_xbox.getLeftX() * MaxSpeed * 0.4) // Drive left with negative X (left)
+      //         .withRotationalRate(limelightPID.calculate(limelightPID.calculate(LimelightHelpers.getTX("limelight"), 0))) // Drive counterclockwise with negative X (left)
+      //     )
+      // );
   }
 
   public Command ElevInit() {
@@ -204,4 +221,30 @@ public class RobotContainer {
     return autoChooser.getSelected();
     // return null; 
   }
+
+  public void registerNamedCommands() {
+    // ELEV L2, PIV RIGHT 
+    NamedCommands.registerCommand("L2Right", new ParallelCommandGroup(
+      new L2ElevPos(elevatorSubsystem), 
+      new PivotRightCommand(coralPivotSub)
+    ));
+
+    // ELEV L2, PIV RIGHT 
+    NamedCommands.registerCommand("L2Left", new ParallelCommandGroup(
+      new L2ElevPos(elevatorSubsystem), 
+      new PivotLeftCommand(coralPivotSub)
+    ));
+
+    // TUCK 
+    NamedCommands.registerCommand("tuck", new TuckCmd(algaeIntakeSubsystem, elevatorSubsystem));
+
+    // OUTTAKE CORAL 
+    NamedCommands.registerCommand("outtake", new CoralDeployerCommand(coralIntakeSub));
+
+    // INTAKE CORAL 
+    NamedCommands.registerCommand("intake", new CoralIntakeCommand(coralIntakeSub, coralPivotSub));
+
+  }
+
+
 }
