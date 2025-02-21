@@ -30,10 +30,12 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
 import frc.robot.subsystems.CoralPivotSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.Lights;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -92,11 +94,21 @@ public class RobotContainer {
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   private final CoralIntakeSubsystem coralIntakeSub = new CoralIntakeSubsystem();
   private final CoralPivotSubsystem coralPivotSub = new CoralPivotSubsystem(); 
+   
+  private final Command coralInnit = new InstantCommand(()->coralPivotSub.setPIDStatus(false), coralPivotSub);
+  private final Command coralSetpoint = new InstantCommand(()-> coralPivotSub.setCoralPivotPIDSetpoint(coralPivotSub.getCoralSwitchEnc()), coralPivotSub);
+  
   public final AlgaeIntakeSubsystem algaeIntakeSubsystem = new AlgaeIntakeSubsystem();
   public final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
 
+  public final Lights lights = new Lights(); 
+
   public final Command elevInit = new InstantCommand(() -> elevatorSubsystem.turnPIDOff(), elevatorSubsystem);
   public final Command disableAlgaeIntakePID = new InstantCommand(() -> algaeIntakeSubsystem.disablePID(), algaeIntakeSubsystem);
+
+  /* * * LIGHT TRIGGERS * * */
+  public final Trigger intakeCoralTrigger = new Trigger(() -> coralIntakeSub.getOpticalSensor()); 
+  // public final Trigger intakeAlgaeTrigger = new Trigger(() -> algaeIntakeSubsystem.getOpticalValue()); 
 
 
   public RobotContainer() {
@@ -135,28 +147,31 @@ public class RobotContainer {
               .withRotationalRate(-d_xbox.getRightX() * MaxAngularRate * 0.7))
       );
 
+      d_xbox.x().whileTrue(new InstantCommand(() -> lights.setSolidColor(0, 2, 61))); 
+      d_xbox.x().whileFalse(new InstantCommand(() -> lights.off())); 
+
       // RESET HEADING 
-      // reset the field-centric heading 
+      //reset the field-centric heading 
       d_xbox.button(8).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
       drivetrain.registerTelemetry(logger::telemeterize);
 
       // OUTPUT CORAL 
-      d_xbox.leftBumper().whileTrue(new CoralDeployerCommand(coralIntakeSub)); 
-      // INTAKE CORAL 
-      d_xbox.rightBumper().whileTrue(new CoralIntakeCommand(coralIntakeSub, coralPivotSub)); 
+      // d_xbox.leftBumper().whileTrue(new CoralDeployerCommand(coralIntakeSub)); 
+      // // INTAKE CORAL 
+      // d_xbox.rightBumper().whileTrue(new CoralIntakeCommand(coralIntakeSub, coralPivotSub)); 
 
-      // // IMTAKE ALGAE FROM GROUND
+      // // // IMTAKE ALGAE FROM GROUND
       // d_xbox.a().onTrue(new AlgaeGroundPickup(elevatorSubsystem, algaeIntakeSubsystem)); 
       // d_xbox.b().whileTrue(new OuttakeCmd(algaeIntakeSubsystem)); 
 
       /* * * CTRE STUFF * * */
 
       // EMERGENCY STOP DRIVETRAIN 
-      d_xbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
-      /// POINT WHEELS  
-      d_xbox.b().whileTrue(drivetrain.applyRequest(() ->
-          point.withModuleDirection(new Rotation2d(-d_xbox.getLeftY(), -d_xbox.getLeftX()))
-      ));
+      // d_xbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
+      // /// POINT WHEELS  
+      // d_xbox.b().whileTrue(drivetrain.applyRequest(() ->
+      //     point.withModuleDirection(new Rotation2d(-d_xbox.getLeftY(), -d_xbox.getLeftX()))
+      // ));
 
       // SYSID 
       // Run SysId routines when holding back/start and X/Y.
@@ -191,8 +206,14 @@ public class RobotContainer {
     // SCORING 
     new JoystickButton(o_joystick, 9).onTrue(new L2Dealgify(elevatorSubsystem, algaeIntakeSubsystem)); 
     new JoystickButton(o_joystick, 7).onTrue(new L3ElevPos(elevatorSubsystem)); 
-    // new JoystickButton(o_joystick, 6).onTrue(new DealgifyL3PositionCmd(algaeIntakeSubsystem)); 
+    new JoystickButton(o_joystick, 6).onTrue(new DealgifyL3PositionCmd(algaeIntakeSubsystem)); 
     new JoystickButton(o_joystick, 8).onTrue(new L2ElevPos(elevatorSubsystem)); 
+
+    //////////////////////////
+    //       TRIGGERS       //
+    //////////////////////////
+    
+    intakeCoralTrigger.whileTrue(new InstantCommand(() -> lights.coralIntake())); 
 
     //////////////////////////
     //        TESTING       //
@@ -209,6 +230,13 @@ public class RobotContainer {
       // );
   }
 
+  public Command coralInnit(){
+    return coralInnit;
+  }
+  public Command coralSetpoint(){
+    return coralSetpoint;
+  }
+
   public Command ElevInit() {
     return elevInit;
   }
@@ -216,6 +244,7 @@ public class RobotContainer {
   public Command disableAlgaeIntakePID(){
     return disableAlgaeIntakePID;
   }
+
  
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();

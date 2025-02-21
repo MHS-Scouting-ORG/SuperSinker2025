@@ -11,21 +11,9 @@
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "L2Right"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "outtake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "tuck"
+            "waitTime": 2.0
           }
         },
         {
@@ -35,33 +23,15 @@
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "intake"
+            "waitTime": 2.0
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "CStoFarC"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L2Left"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "outtake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "tuck"
           }
         }
       ]

@@ -22,6 +22,7 @@ public class NoAlgaeTuckCmd extends Command {
   @Override
   public void initialize() {
     algaeIntakeSub.setSetpoint(20);
+    algaeIntakeSub.enablePID();
     // algaeIntakeSub.disablePID();
     // algaeIntakeSub.setOutput(0.3);
     // algaeIntakeSub.setSetpoint(5);
@@ -31,7 +32,7 @@ public class NoAlgaeTuckCmd extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    algaeIntakeSub.setOutput(0.3);
+    algaeIntakeSub.setOutput(0.4);
     // if(algaeIntakeSub.getLSValue()){
     //   algaeIntakeSub.disablePID();
     //   algaeIntakeSub.setOutput(0.1);

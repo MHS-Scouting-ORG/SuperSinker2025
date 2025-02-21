@@ -22,7 +22,7 @@ public class CoralIntakeCommand extends Command {
     @Override
     public void initialize() {
       coralPivotSub.setPIDStatus(true);
-      coralPivotSub.setCoralPivotPIDSetpoint(-340);
+      coralPivotSub.setCoralPivotPIDSetpoint(-380);
       coralIntakeSub.setIntakeSpeed(CoralConstants.CORAL_INTAKE_SPEED);
     }
 

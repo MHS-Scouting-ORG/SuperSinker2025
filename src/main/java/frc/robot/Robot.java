@@ -10,7 +10,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-
+  private Command coralInnitCommand;
+  private Command coralSetpointCommand;
   private final RobotContainer m_robotContainer;
 
   private final Command disableAlgaePivotPID;
@@ -20,6 +21,8 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
 
     elevInit = m_robotContainer.ElevInit();
+    coralInnitCommand = m_robotContainer.coralInnit();
+    coralSetpointCommand = m_robotContainer.coralSetpoint();
     // algaeInit = m_robotContainer.algaeInit();
     disableAlgaePivotPID = m_robotContainer.disableAlgaeIntakePID();
 
@@ -42,6 +45,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    coralSetpointCommand = m_robotContainer.coralSetpoint();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
@@ -63,6 +67,11 @@ public class Robot extends TimedRobot {
     disableAlgaePivotPID.schedule();
     disableAlgaePivotPID.cancel();
     
+    coralInnitCommand.schedule();
+    coralInnitCommand.cancel();
+    // coralSetpointCommand.schedule();
+    // coralSetpointCommand.cancel();
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
