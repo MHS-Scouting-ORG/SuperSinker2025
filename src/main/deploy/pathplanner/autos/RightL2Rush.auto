@@ -5,33 +5,115 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "StartRight"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "algae tuck"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.0
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "middle"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "StartRight"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L2Right"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "outtake"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "FarCToCS"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "tuck"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intake"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
+            "waitTime": 5.0
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "FarCToCS"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "CStoFarC"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L2Left"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 2.0
+            "name": "outtake"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "CStoFarC"
+            "name": "tuck"
           }
         }
       ]

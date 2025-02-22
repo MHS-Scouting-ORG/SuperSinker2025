@@ -77,4 +77,9 @@ public class Constants {
     public static final int CORAL_OPTICAL_SENSOR_ID = 1;
 
   }
+
+  public final class SwerveConstants {
+    public final int[] BLUE_REEF_IDS = {17, 18, 19, 20, 21, 22}; 
+    public final int[] RED_REEF_IDS = {6, 7, 8, 9, 10, 11}; 
+  }
 }

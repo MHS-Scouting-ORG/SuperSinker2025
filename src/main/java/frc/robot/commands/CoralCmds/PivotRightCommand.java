@@ -21,12 +21,13 @@ public class PivotRightCommand extends Command {
   @Override
   public void initialize() {
     coralPivotSub.setPIDStatus(true);
+    coralPivotSub.pivotMiddleToRight();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    coralPivotSub.setCoralPivotPIDSetpoint(-50);
+    coralPivotSub.setCoralPivotPIDSetpoint(-75);
   }
 
   // Called once the command ends or is interrupted.
@@ -37,6 +38,6 @@ public class PivotRightCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return coralPivotSub.atSetpoint() || coralPivotSub.getLimitSwitch();
+    return coralPivotSub.atSetpoint();
   }
 }

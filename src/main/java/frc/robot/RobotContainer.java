@@ -2,6 +2,7 @@ package frc.robot;
 
 import frc.robot.commands.AlgaeIntakeCmds.IntakeCmd;
 import frc.robot.commands.AlgaeIntakeCmds.OuttakeCmd;
+import frc.robot.commands.AlgaePivotCmds.AlgaeTuckCmd;
 import frc.robot.commands.AlgaePivotCmds.DealgifyL3PositionCmd;
 import frc.robot.commands.AlgaePivotCmds.NoAlgaeTuckCmd;
 import frc.robot.commands.CoralCmds.CoralDeployerCommand;
@@ -38,6 +39,8 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.Lights;
 
 import static edu.wpi.first.units.Units.*;
+
+import java.util.jar.Attributes.Name;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
@@ -264,8 +267,14 @@ public class RobotContainer {
       new PivotLeftCommand(coralPivotSub)
     ));
 
+    // PIV MID
+    NamedCommands.registerCommand("middle", new PivotMiddleCommand(coralPivotSub));
+
     // TUCK 
     NamedCommands.registerCommand("tuck", new TuckCmd(algaeIntakeSubsystem, elevatorSubsystem));
+
+    // ALGAE TUCK
+    NamedCommands.registerCommand("algae tuck", new NoAlgaeTuckCmd(algaeIntakeSubsystem));
 
     // OUTTAKE CORAL 
     NamedCommands.registerCommand("outtake", new CoralDeployerCommand(coralIntakeSub));
