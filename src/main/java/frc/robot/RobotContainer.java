@@ -215,7 +215,7 @@ public class RobotContainer {
 
     // TUCKS 
     new JoystickButton(o_joystick, 11).onTrue(new TuckWithAlgae(algaeIntakeSubsystem, elevatorSubsystem)); 
-    new JoystickButton(o_joystick, 12).onTrue(new TuckCmd(algaeIntakeSubsystem, elevatorSubsystem)); 
+    new JoystickButton(o_joystick, 12).onTrue(new ParallelCommandGroup(new PivotMiddleCommand(coralPivotSub), new TuckCmd(algaeIntakeSubsystem, elevatorSubsystem))); 
     new JoystickButton(o_joystick, 5).onTrue(new NoAlgaeTuckCmd(algaeIntakeSubsystem)); 
 
     // PROCESSOR 
