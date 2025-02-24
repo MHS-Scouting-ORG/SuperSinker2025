@@ -3,10 +3,12 @@ package frc.robot;
 import frc.robot.commands.AlgaeIntakeCmds.IntakeCmd;
 import frc.robot.commands.AlgaeIntakeCmds.OuttakeCmd;
 import frc.robot.commands.AlgaePivotCmds.AlgaeTuckCmd;
+import frc.robot.commands.AlgaePivotCmds.DealgifyL2PositionCmd;
 import frc.robot.commands.AlgaePivotCmds.DealgifyL3PositionCmd;
 import frc.robot.commands.AlgaePivotCmds.NoAlgaeTuckCmd;
 import frc.robot.commands.CoralCmds.CoralDeployerCommand;
 import frc.robot.commands.CoralCmds.CoralIntakeCommand;
+import frc.robot.commands.CoralCmds.L1CoralDeployerCommand;
 import frc.robot.commands.CoralCmds.PivotLeftCommand;
 import frc.robot.commands.CoralCmds.PivotMiddleCommand;
 import frc.robot.commands.CoralCmds.PivotRightCommand;
@@ -17,6 +19,7 @@ import frc.robot.commands.IntegratedCmds.L2Dealgify;
 import frc.robot.commands.IntegratedCmds.ProcessorScoring;
 import frc.robot.commands.IntegratedCmds.TuckCmd;
 import frc.robot.commands.IntegratedCmds.TuckWithAlgae;
+import frc.robot.commands.SwerveCmds.SwerveFollowTagCmd;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -51,6 +54,7 @@ import frc.robot.LimelightHelpers;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -99,7 +103,8 @@ public class RobotContainer {
   private final CoralPivotSubsystem coralPivotSub = new CoralPivotSubsystem(); 
    
   private final Command coralInnit = new InstantCommand(()->coralPivotSub.setPIDStatus(false), coralPivotSub);
-  private final Command coralSetpoint = new InstantCommand(()-> coralPivotSub.setCoralPivotPIDSetpoint(coralPivotSub.getCoralSwitchEnc()), coralPivotSub);
+  private final Command coralSetpoint = new InstantCommand(()-> coralPivotSub.setCoralPivotPIDSetpoint(coralPivotSub.getCoralSwitchEnc()), coralPivotSub); 
+  
   
   public final AlgaeIntakeSubsystem algaeIntakeSubsystem = new AlgaeIntakeSubsystem();
   public final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
@@ -108,6 +113,7 @@ public class RobotContainer {
 
   public final Command elevInit = new InstantCommand(() -> elevatorSubsystem.turnPIDOff(), elevatorSubsystem);
   public final Command disableAlgaeIntakePID = new InstantCommand(() -> algaeIntakeSubsystem.disablePID(), algaeIntakeSubsystem);
+  public final Command intakeZero = new InstantCommand(() -> algaeIntakeSubsystem.stopIntakeMotor(), algaeIntakeSubsystem);
 
   /* * * LIGHT TRIGGERS * * */
   public final Trigger intakeCoralTrigger = new Trigger(() -> coralIntakeSub.getOpticalSensor()); 
@@ -136,9 +142,9 @@ public class RobotContainer {
       drivetrain.setDefaultCommand(
           // Drivetrain will execute this command periodically
           drivetrain.applyRequest(() ->
-              drive.withVelocityX(-d_xbox.getLeftY() * MaxSpeed * 0.5) // Drive forward with negative Y (forward)
-                  .withVelocityY(-d_xbox.getLeftX() * MaxSpeed * 0.5) // Drive left with negative X (left)
-                  .withRotationalRate(-d_xbox.getRightX() * MaxAngularRate * 0.7) // Drive counterclockwise with negative X (left)
+              drive.withVelocityX(-d_xbox.getLeftY() * MaxSpeed * 0.6) // Drive forward with negative Y (forward)
+                  .withVelocityY(-d_xbox.getLeftX() * MaxSpeed * 0.6) // Drive left with negative X (left)
+                  .withRotationalRate(-d_xbox.getRightX() * MaxAngularRate * 0.75) // Drive counterclockwise with negative X (left)
           )
       );  
 
@@ -148,7 +154,14 @@ public class RobotContainer {
               driveRobotCentric.withVelocityX(-d_xbox.getLeftY() * MaxSpeed * 0.5)
               .withVelocityY(-d_xbox.getLeftX() * MaxSpeed * 0.5)
               .withRotationalRate(-d_xbox.getRightX() * MaxAngularRate * 0.7))
+              // .withRotationalRate(drivetrain.followTag(Units.radiansToDegrees(drivetrain.getRotation3d().getAngle()), -d_xbox.getRightX()) * MaxAngularRate * 0.7))
       );
+      // SmartDashboard.putNumber("heading", Units.radiansToDegrees(drivetrain.getRotation3d().getAngle())); 
+      // drivetrain.followTag(Units.radiansToDegrees(drivetrain.getRotation3d().getAngle()), -d_xbox.getRightX());     
+      // () -> -d_xbox.getLeftY(), 
+      // () -> -d_xbox.getLeftX(), 
+      // () -> -d_xbox.getRightX()
+      // )); 
 
       d_xbox.x().whileTrue(new InstantCommand(() -> lights.setSolidColor(0, 2, 61))); 
       d_xbox.x().whileFalse(new InstantCommand(() -> lights.off())); 
@@ -159,13 +172,15 @@ public class RobotContainer {
       drivetrain.registerTelemetry(logger::telemeterize);
 
       // OUTPUT CORAL 
-      // d_xbox.leftBumper().whileTrue(new CoralDeployerCommand(coralIntakeSub)); 
-      // // INTAKE CORAL 
-      // d_xbox.rightBumper().whileTrue(new CoralIntakeCommand(coralIntakeSub, coralPivotSub)); 
+      d_xbox.leftBumper().whileTrue(new CoralDeployerCommand(coralIntakeSub)); 
+      // OUTPUT L1 
+      d_xbox.y().whileTrue(new L1CoralDeployerCommand(coralIntakeSub)); 
+      // INTAKE CORAL 
+      d_xbox.rightBumper().whileTrue(new CoralIntakeCommand(coralIntakeSub, coralPivotSub)); 
 
       // // // IMTAKE ALGAE FROM GROUND
-      // d_xbox.a().onTrue(new AlgaeGroundPickup(elevatorSubsystem, algaeIntakeSubsystem)); 
-      // d_xbox.b().whileTrue(new OuttakeCmd(algaeIntakeSubsystem)); 
+      d_xbox.a().onTrue(new AlgaeGroundPickup(elevatorSubsystem, algaeIntakeSubsystem)); 
+      d_xbox.b().whileTrue(new OuttakeCmd(algaeIntakeSubsystem)); 
 
       /* * * CTRE STUFF * * */
 
@@ -248,6 +263,9 @@ public class RobotContainer {
     return disableAlgaeIntakePID;
   }
 
+  public Command intakeZero(){
+    return intakeZero;
+  }
  
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
@@ -270,6 +288,15 @@ public class RobotContainer {
     // PIV MID
     NamedCommands.registerCommand("middle", new PivotMiddleCommand(coralPivotSub));
 
+    // PIV LEFT 
+    NamedCommands.registerCommand("pivotLeft", new PivotLeftCommand(coralPivotSub));
+
+    // PIV RIGHT 
+    NamedCommands.registerCommand("pivotRight", new PivotRightCommand(coralPivotSub));
+
+    //L1 OUTTAKE 
+    NamedCommands.registerCommand("L1Outtake", new L1CoralDeployerCommand(coralIntakeSub));
+
     // TUCK 
     NamedCommands.registerCommand("tuck", new TuckCmd(algaeIntakeSubsystem, elevatorSubsystem));
 
@@ -281,6 +308,15 @@ public class RobotContainer {
 
     // INTAKE CORAL 
     NamedCommands.registerCommand("intake", new CoralIntakeCommand(coralIntakeSub, coralPivotSub));
+
+    // DEALG L2 
+    NamedCommands.registerCommand("dealgifyL2", new L2Dealgify(elevatorSubsystem, algaeIntakeSubsystem));
+
+    //ALGAE INTAKE ON 
+    NamedCommands.registerCommand("algaeIntake", new IntakeCmd(algaeIntakeSubsystem));
+
+    // NO ALG TUCK 
+    NamedCommands.registerCommand("noAlgaeTuck", new AlgaeTuckCmd(algaeIntakeSubsystem));
 
   }
 

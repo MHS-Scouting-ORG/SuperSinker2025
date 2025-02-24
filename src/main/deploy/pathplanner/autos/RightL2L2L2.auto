@@ -5,7 +5,7 @@
     "data": {
       "commands": [
         {
-          "type": "race",
+          "type": "parallel",
           "data": {
             "commands": [
               {
@@ -15,18 +15,12 @@
                 }
               },
               {
-                "type": "wait",
+                "type": "named",
                 "data": {
-                  "waitTime": 1.0
+                  "name": "middle"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "middle"
           }
         },
         {
@@ -52,68 +46,6 @@
           "type": "named",
           "data": {
             "name": "outtake"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.1
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "FarCToCS"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "tuck"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intake"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "CStoFarC"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L2Left"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "outtake"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.1
           }
         },
         {
@@ -163,19 +95,57 @@
         {
           "type": "named",
           "data": {
-            "name": "middle"
+            "name": "outtake"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "CloseBToRCS"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "tuck"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intake"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "CSToCloseB"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L2Left"
+                }
+              }
+            ]
           }
         },
         {
           "type": "named",
           "data": {
             "name": "outtake"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.1
           }
         },
         {

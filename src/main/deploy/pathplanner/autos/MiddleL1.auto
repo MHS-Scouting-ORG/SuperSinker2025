@@ -1,0 +1,50 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "MiddleToFarBL1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "algae tuck"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "middle"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "pivotRight"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L1Outtake"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

@@ -5,28 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "algae tuck"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 1.0
-                }
-              }
-            ]
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "middle"
+            "name": "algae tuck"
           }
         },
         {
@@ -36,63 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "StartRight"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L2Right"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "outtake"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.1
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "FarCToCS"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "tuck"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intake"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "CStoFarC"
+                  "pathName": "LeftFarA"
                 }
               },
               {
@@ -111,19 +36,13 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.1
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "FarCToCS"
+                  "pathName": "FarAToLCS"
                 }
               },
               {
@@ -148,7 +67,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CSToCloseB"
+                  "pathName": "LCStoFarA"
                 }
               },
               {
@@ -163,25 +82,57 @@
         {
           "type": "named",
           "data": {
-            "name": "middle"
+            "name": "outtake"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "FarAToLCS"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "tuck"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intake"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "LCStoCloseB"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L2Left"
+                }
+              }
+            ]
           }
         },
         {
           "type": "named",
           "data": {
             "name": "outtake"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.1
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "tuck"
           }
         }
       ]

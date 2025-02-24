@@ -5,28 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "algae tuck"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 1.0
-                }
-              }
-            ]
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "middle"
+            "name": "algae tuck"
           }
         },
         {
@@ -36,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "StartRight"
+                  "pathName": "LeftFarA"
                 }
               },
               {
@@ -55,19 +36,13 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.1
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "FarCToCS"
+                  "pathName": "FarAToLCS"
                 }
               },
               {
@@ -92,7 +67,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CStoFarC"
+                  "pathName": "LCStoCloseB"
                 }
               },
               {
@@ -111,19 +86,13 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.1
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "FarCToCS"
+                  "pathName": "CloseBToLCS"
                 }
               },
               {
@@ -148,7 +117,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CSToCloseB"
+                  "pathName": "LCStoCloseB"
                 }
               },
               {
@@ -163,19 +132,7 @@
         {
           "type": "named",
           "data": {
-            "name": "middle"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "outtake"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.1
           }
         },
         {

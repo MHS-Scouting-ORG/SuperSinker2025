@@ -12,6 +12,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private Command coralInnitCommand;
   private Command coralSetpointCommand;
+  private Command intakeZeroCommand;
   private final RobotContainer m_robotContainer;
 
   private final Command disableAlgaePivotPID;
@@ -23,8 +24,8 @@ public class Robot extends TimedRobot {
     elevInit = m_robotContainer.ElevInit();
     coralInnitCommand = m_robotContainer.coralInnit();
     coralSetpointCommand = m_robotContainer.coralSetpoint();
-    // algaeInit = m_robotContainer.algaeInit();
     disableAlgaePivotPID = m_robotContainer.disableAlgaeIntakePID();
+    intakeZeroCommand = m_robotContainer.intakeZero();
 
   }
 
@@ -34,7 +35,10 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    coralSetpointCommand.schedule();
+    coralSetpointCommand.cancel();
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -51,9 +55,15 @@ public class Robot extends TimedRobot {
 
     disableAlgaePivotPID.schedule();
     disableAlgaePivotPID.cancel();
-    
+
+    intakeZeroCommand.schedule();
+    intakeZeroCommand.cancel();
+
     coralInnitCommand.schedule();
     coralInnitCommand.cancel();
+
+    // coralSetpointCommand.schedule();
+    // coralSetpointCommand.cancel();
     
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
@@ -69,16 +79,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
 
-    elevInit.schedule();
-    elevInit.cancel();
-
-    disableAlgaePivotPID.schedule();
-    disableAlgaePivotPID.cancel();
-    
     coralInnitCommand.schedule();
     coralInnitCommand.cancel();
-    // coralSetpointCommand.schedule();
-    // coralSetpointCommand.cancel();
+
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();

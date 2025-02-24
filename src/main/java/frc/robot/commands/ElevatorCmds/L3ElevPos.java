@@ -48,6 +48,6 @@ public class L3ElevPos extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return timer.get() >= 0.;
+    return timer.get() >= 0.25;
   }
 }

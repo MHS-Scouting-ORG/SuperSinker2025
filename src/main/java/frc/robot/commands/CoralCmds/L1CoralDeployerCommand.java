@@ -6,10 +6,10 @@ import frc.robot.subsystems.CoralIntakeSubsystem;
 import frc.robot.Constants.CoralConstants;
 
 
-public class CoralDeployerCommand extends Command {
+public class L1CoralDeployerCommand extends Command {
     private CoralIntakeSubsystem coralIntakeSub; 
   
-    public CoralDeployerCommand(CoralIntakeSubsystem coralIntakeSub) {
+    public L1CoralDeployerCommand(CoralIntakeSubsystem coralIntakeSub) {
       this.coralIntakeSub = coralIntakeSub;
       addRequirements(this.coralIntakeSub);
     }
@@ -21,7 +21,7 @@ public class CoralDeployerCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-      coralIntakeSub.setIntakeSpeed(CoralConstants.CORAL_DEPLOY_SPEED);
+      coralIntakeSub.setIntakeSpeed(CoralConstants.CORAL_DEPLOY_SPEED - 0.4);
     }
   
     // Called once the command ends or is interrupted.

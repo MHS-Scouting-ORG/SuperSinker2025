@@ -58,9 +58,10 @@ public class Constants {
 
     public static final double TOLERANCE = 5; 
 
-    public static final double CURRENTLIMIT = 50;
 
-    public static final double MAXSPEED = 0.8;
+    public static final double CURRENTLIMIT = 30;
+
+    public static final double MAXSPEED = 1.0; //0.8
   }
 
   public final class CoralConstants {
@@ -69,7 +70,7 @@ public class Constants {
     public static final double CORAL_INTAKE_SPEED = 0.8;
     public static final double CORAL_DEPLOY_SPEED = 0.8;
     public static final double CORAL_OUTTAKE_SPEED = 0;
-    public static final double CORAL_PIVOT_SPEED = 0.4;
+    public static final double CORAL_PIVOT_SPEED = 0.6;
 
     // IDs
     public static final int CORAL_INTAKE_ID = 15;
@@ -81,5 +82,9 @@ public class Constants {
   public final class SwerveConstants {
     public final int[] BLUE_REEF_IDS = {17, 18, 19, 20, 21, 22}; 
     public final int[] RED_REEF_IDS = {6, 7, 8, 9, 10, 11}; 
+
+    public static final double turningKp = 0.01; 
+    public static final double turningKi = 0.0;
+    public static final double turningKd = 0.0; 
   }
 }
