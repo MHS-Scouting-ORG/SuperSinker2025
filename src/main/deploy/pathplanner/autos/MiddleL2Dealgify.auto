@@ -42,7 +42,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "MiddleToFarB"
+                  "pathName": "MiddleToFarBL1"
                 }
               }
             ]
@@ -80,9 +80,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "race",
           "data": {
-            "name": "outtake"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "outtake"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.5
+                }
+              }
+            ]
           }
         },
         {

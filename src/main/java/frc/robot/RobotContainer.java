@@ -318,6 +318,8 @@ public class RobotContainer {
     // NO ALG TUCK 
     NamedCommands.registerCommand("noAlgaeTuck", new AlgaeTuckCmd(algaeIntakeSubsystem));
 
+    NamedCommands.registerCommand("TuckWithAlgae", new TuckWithAlgae(algaeIntakeSubsystem, elevatorSubsystem));
+
   }
 
 
